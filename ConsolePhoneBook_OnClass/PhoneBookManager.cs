@@ -1,5 +1,6 @@
 ﻿using ClassLibrary0916;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConsolePhoneBook_OnClass
 {
+	
 	class PhoneBookManager
 	{
 		const int MAX_CNT = 100;
@@ -22,7 +24,7 @@ namespace ConsolePhoneBook_OnClass
 		public void ShowMenu()
 		{
 			Console.WriteLine("---------------------- 주소록 ------------------------");
-			Console.WriteLine("1. 입력  |  2. 목록  | 3. 검색  | 4.삭제  |  5. 종료");
+			Console.WriteLine("1. 입력  |  2. 목록  | 3. 검색  | 4.삭제  |  5. 정렬  |  6. 종료");
 			Console.WriteLine("------------------------------------------------------");
 			Console.Write("선택 : ");
 		}
@@ -278,5 +280,13 @@ namespace ConsolePhoneBook_OnClass
 				
 			}
 		}
+		public void SortData()
+		{	
+
+			Array.c
+			Array.Sort(infoStorage, new PhoneInfoNameComparer());
+		}
+
+	
 	}
 }

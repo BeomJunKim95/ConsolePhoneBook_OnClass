@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,26 @@ using System.Threading.Tasks;
 
 namespace ConsolePhoneBook_OnClass
 {
-	public class PhoneInfo
+	class PhoneInfoNameComparer : IComparer // sort에 직접줄때는 Comparer를 써야함
+										 // 다른클래스로 비교하는걸 따로 만들 때에는 IComparer
+	{
+		public int Compare(object x, object y) // Compare는 인자가 두개
+		{
+			//나이가 크면 1, 나이가 작으면 -1, 나이가 같으면 0
+			PhoneInfo first = x as PhoneInfo;
+			PhoneInfo second = y as PhoneInfo;
+
+			if (first.Name.CompareTo(second.Name) == 1)
+				return 1; // 오름차순
+						  //return -1;  // 내림차순 1이면 바꾸고 -1이면 안바꾸고
+			else if (first.Name.CompareTo(second.Name) == -1)
+				return -1; //오름차순
+						   //return 1;  //내림차순
+			else
+				return 0;
+		}
+	}
+	public class PhoneInfo : IComparable
 	{
 		string name; //필수
 		string phoneNumber; //필수
@@ -14,6 +34,9 @@ namespace ConsolePhoneBook_OnClass
 
 		public string Name 
 		{ get { return name; } }
+
+		public string PhoneNumber 
+		{ get { return phoneNumber; } }
 
 		public PhoneInfo(string name, string phoneNumber)
 		{
@@ -46,8 +69,23 @@ namespace ConsolePhoneBook_OnClass
 			return val;
 		}
 
-		
+		public int CompareTo(object obj)
+		{
+			
+				PhoneInfo sortPhoneNum = obj as PhoneInfo;
 
+
+				if (this.PhoneNumber.CompareTo(sortPhoneNum.PhoneNumber) ==1)
+					//return 1; // 오름차순
+					return -1;  // 내림차순 1이면 바꾸고 -1이면 안바꾸고
+				else if (this.PhoneNumber.CompareTo(sortPhoneNum.PhoneNumber) == -1)
+					//return -1; //오름차순
+					return 1;  //내림차순
+				else
+					return 0;
+
+			
+		}
 	}
 	public class PhoneUnivInfo : PhoneInfo
 	{
