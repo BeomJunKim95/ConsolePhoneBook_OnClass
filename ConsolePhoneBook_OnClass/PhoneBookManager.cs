@@ -31,98 +31,34 @@ namespace ConsolePhoneBook_OnClass
 
 		public void InputData()
 		{
-			string major = "";
-			int year = 0;
-			int choice = 0;
-			string company = "";
+			int choice;
 
-			while (true)
+			Console.WriteLine("1. 일반  2. 대학  3. 회사");
+			Console.Write("선택 >>  ");
+			choice = Utility.ConvertInt(Console.ReadLine());
+			if (choice < 1 || choice > 3)
 			{
-				Console.WriteLine("1. 일반  2. 대학  3. 회사");
-				Console.Write("선택 >>  ");
-				choice = Utility.ConvertInt(Console.ReadLine());
-				if (choice > 3)
-				{
-					Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
-					return;
-				}
-				switch (choice)
-				{
-					case 1:
-						break;
-
-					case 2:
-						Console.Write("학과 : ");
-						major = Console.ReadLine().Trim().Replace(" ", "");
-						if (string.IsNullOrEmpty(major))
-						{
-							Console.WriteLine("학과입력은 필수입력입니다");
-							return;
-						}
-						Console.Write("학년 : ");
-						year = Utility.ConvertInt(Console.ReadLine().Trim().Replace(" ", ""));
-						if (year == 0)
-						{
-							Console.WriteLine("학년은 필수입력입니다");
-							return;
-						}
-						break;
-
-					case 3:
-						Console.Write("회사 : ");
-						company = Console.ReadLine().Trim().Replace(" ", "");
-						if (string.IsNullOrEmpty(company))
-						{
-							Console.WriteLine("회사입력은 필수입력입니다");
-							return;
-						}
-						break;
-				}
-			
+				Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
+				return;
+			}
+			PhoneInfo info = null;
+			switch (choice)
+			{
+				case 1:
+					info = InputFriendInfo();
+					break;
+				case 2:
+					info = InputUnivInfo();
+					break;
+				case 3:
+					info = InputCompanyInfo();
 					break;
 			}
-
-			Console.Write("이름 : ");
-			string name = Console.ReadLine().Trim().Replace(" ", ""); //Trim() : 공백제거, Replace() : 공백이나 문자 제거
-			if (string.IsNullOrEmpty(name)) // if (name == "") or if (name.Length < 1) or if (name.Equals(""))
+			if (info != null)
 			{
-				Console.WriteLine("이름은 필수입력입니다");
-				return;
+				infoStorage[curCnt++] = info;
+				Console.WriteLine("성공적으로 등록이 완료됐습니다.\n");
 			}
-			else
-			{
-				int dataIdx = SearhName(name);
-				if (dataIdx > -1)
-				{
-					Console.WriteLine("이미 등록된 이름입니다. 다른 이름으로 입력하세요.");
-					return;
-				}
-			}
-
-			Console.Write("전화번호 : ");
-			string phoneNum = Console.ReadLine().Trim().Replace(" ", "");
-			if (string.IsNullOrEmpty(phoneNum))
-			{
-				Console.WriteLine("전화번호는 필수입력입니다");
-				return;
-			}
-
-			Console.Write("생일 : ");
-			string birth = Console.ReadLine().Trim();
-
-			if (choice == 1)
-			{
-				if (birth.Length < 1)
-					infoStorage[curCnt++] = new PhoneInfo(name, phoneNum);
-				else if (major.Length < 1 && year == 0)
-					infoStorage[curCnt++] = new PhoneInfo(name, phoneNum, birth);
-			}
-			else if (choice == 2)
-				infoStorage[curCnt++] = new PhoneUnivInfo(name, phoneNum, birth, major, year);
-			else
-				infoStorage[curCnt++] = new PhoneCompanyInfo(name, phoneNum, birth, company);
-
-			Console.WriteLine("성공적으로 등록이 완료됐습니다.\n");
 
 			#region 내코드
 				//for (curCnt = 0; curCnt < infoStorage.Length; curCnt++)
@@ -145,6 +81,100 @@ namespace ConsolePhoneBook_OnClass
 				//		infoStorage[curCnt] = new PhoneInfo(name, phoneNumber, birth);
 				//}
 				#endregion
+		}
+
+		private PhoneInfo InputCompanyInfo()
+		{
+			string[] cominfo = InputCommonInfo();
+			if (cominfo == null || cominfo.Length != 3)
+				return null;
+			Console.Write("회사 : ");
+			string company = Console.ReadLine().Trim().Replace(" ", "");
+			if (string.IsNullOrEmpty(company))
+			{
+				Console.WriteLine("회사입력은 필수입력입니다");
+				return null;
+			}
+			return new PhoneCompanyInfo(cominfo[0], cominfo[1], cominfo[2], company);
+		}
+
+		private PhoneInfo InputUnivInfo()
+		{
+			string[] cominfo = InputCommonInfo();
+			if (cominfo == null || cominfo.Length != 3)
+				return null;
+			Console.Write("학과 : ");
+			string major = Console.ReadLine().Trim().Replace(" ", "");
+			if (string.IsNullOrEmpty(major))
+			{
+				Console.WriteLine("학과입력은 필수입력입니다");
+				return null;
+			}
+			Console.Write("학년 : ");
+			int year = Utility.ConvertInt(Console.ReadLine().Trim().Replace(" ", ""));
+			if (year == 0)
+			{
+				Console.WriteLine("학년은 필수입력입니다");
+				return null;
+			}
+			//if (cominfo[2].Length < 1)
+			//{
+				return new PhoneUnivInfo(cominfo[0], cominfo[1], cominfo[2], major, year);
+			//}
+			//else
+			//	return new PhoneInfo(cominfo[0], cominfo[1], cominfo[2]);
+		}
+
+		private string[] InputCommonInfo()
+		{
+			Console.Write("이름 : ");
+			string name = Console.ReadLine().Trim().Replace(" ", ""); //Trim() : 공백제거, Replace() : 공백이나 문자 제거
+			if (string.IsNullOrEmpty(name)) // if (name == "") or if (name.Length < 1) or if (name.Equals(""))
+			{
+				Console.WriteLine("이름은 필수입력입니다");
+				return null;
+			}
+			else
+			{
+				int dataIdx = SearhName(name);
+				if (dataIdx > -1)
+				{
+					Console.WriteLine("이미 등록된 이름입니다. 다른 이름으로 입력하세요.");
+					return null;
+				}
+			}
+
+			Console.Write("전화번호 : ");
+			string phoneNum = Console.ReadLine().Trim().Replace(" ", "");
+			if (string.IsNullOrEmpty(phoneNum))
+			{
+				Console.WriteLine("전화번호는 필수입력입니다");
+				return null;
+			}
+
+			Console.Write("생일 : ");
+			string birth = Console.ReadLine().Trim();
+
+			string[] arr = new string[3];
+			arr[0] = name;
+			arr[1] = phoneNum;
+			arr[2] = birth;
+
+			return arr;
+		}
+
+		private PhoneInfo InputFriendInfo()
+		{
+			string[] cominfo = InputCommonInfo();
+			if(cominfo == null || cominfo.Length != 3)
+				return null;
+			if (cominfo[2].Length < 1)
+			{
+				return new PhoneInfo(cominfo[0], cominfo[1]);
+			}
+			else
+				return new PhoneInfo(cominfo[0], cominfo[1], cominfo[2]);
+			
 		}
 		public void ListData()
 		{
@@ -281,10 +311,41 @@ namespace ConsolePhoneBook_OnClass
 			}
 		}
 		public void SortData()
-		{	
+		{
+			Console.WriteLine("1. 이름 오름차순  |  2. 이름 내림차순  |  3. 전화번호 오름차순  |  4. 전화번호 내림차순");
+			Console.Write("선택 >>  ");
+			int choice;
 
-			Array.c
-			Array.Sort(infoStorage, new PhoneInfoNameComparer());
+			choice = Utility.ConvertInt(Console.ReadLine());
+			if (choice < 1 || choice > 3)
+			{
+				Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
+				return;
+			}
+			PhoneInfo[] infoStorage_Copy = new PhoneInfo[curCnt];
+			Array.Copy(infoStorage, infoStorage_Copy, curCnt);
+			switch(choice)
+			{
+				case 1:
+					Array.Sort(infoStorage_Copy, new PhoneInfoNameComparer());
+					break;
+				case 2:
+					Array.Sort(infoStorage_Copy, new PhoneInfoNameComparer());
+					Array.Reverse(infoStorage_Copy);
+					break;
+				case 3:
+					Array.Sort(infoStorage_Copy);
+					break;
+				case 4:
+					Array.Sort(infoStorage_Copy);
+					Array.Reverse(infoStorage_Copy);
+					break;
+			}
+
+			for(int i = 0; i<curCnt; i++)
+			{
+				Console.WriteLine(infoStorage_Copy[i].ToString());
+			}
 		}
 
 	

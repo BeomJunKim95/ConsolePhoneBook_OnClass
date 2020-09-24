@@ -13,8 +13,8 @@ namespace ConsolePhoneBook_OnClass
 		public int Compare(object x, object y) // Compare는 인자가 두개
 		{
 			//나이가 크면 1, 나이가 작으면 -1, 나이가 같으면 0
-			PhoneInfo first = x as PhoneInfo;
-			PhoneInfo second = y as PhoneInfo;
+			PhoneInfo first = (PhoneInfo)x;
+			PhoneInfo second = (PhoneInfo)y;
 
 			if (first.Name.CompareTo(second.Name) == 1)
 				return 1; // 오름차순
@@ -71,16 +71,16 @@ namespace ConsolePhoneBook_OnClass
 
 		public int CompareTo(object obj)
 		{
-			
-				PhoneInfo sortPhoneNum = obj as PhoneInfo;
+
+			PhoneInfo sortPhoneNum = (PhoneInfo)obj;
 
 
 				if (this.PhoneNumber.CompareTo(sortPhoneNum.PhoneNumber) ==1)
-					//return 1; // 오름차순
-					return -1;  // 내림차순 1이면 바꾸고 -1이면 안바꾸고
+					return 1; // 오름차순
+					//return -1;  // 내림차순 1이면 바꾸고 -1이면 안바꾸고
 				else if (this.PhoneNumber.CompareTo(sortPhoneNum.PhoneNumber) == -1)
-					//return -1; //오름차순
-					return 1;  //내림차순
+					return -1; //오름차순
+					//return 1;  //내림차순
 				else
 					return 0;
 

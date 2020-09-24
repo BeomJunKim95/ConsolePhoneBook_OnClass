@@ -12,7 +12,7 @@ namespace ConsolePhoneBook_OnClass
 		static void Main(string[] args)
 		{
 			PhoneBookManager manager = new PhoneBookManager();
-
+			
 			while (true)
 			{
 				manager.ShowMenu();
@@ -26,6 +26,8 @@ namespace ConsolePhoneBook_OnClass
 					case 4: manager.DeleteData(); break;
 					case 5: manager.SortData(); break;
 					case 6: Console.WriteLine("프로그램을 종료합니다."); return;
+					default: Console.WriteLine("\n1 ~ 6까지의 숫자만 입력해주세요"); break;
+						
 				}
 			}
 		}
