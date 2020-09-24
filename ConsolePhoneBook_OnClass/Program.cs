@@ -11,23 +11,30 @@ namespace ConsolePhoneBook_OnClass
 	{
 		static void Main(string[] args)
 		{
-			PhoneBookManager manager = new PhoneBookManager();
 			
+			PhoneBookManager manager = PhoneBookManager.CreateInstance();
+
 			while (true)
 			{
-				manager.ShowMenu();
-				int choice = Utility.ConvertInt(Console.ReadLine());
-
-				switch (choice)
+				try
 				{
-					case 1: manager.InputData(); break;
-					case 2: manager.ListData(); break;
-					case 3: manager.SearchData(); break;
-					case 4: manager.DeleteData(); break;
-					case 5: manager.SortData(); break;
-					case 6: Console.WriteLine("프로그램을 종료합니다."); return;
-					default: Console.WriteLine("\n1 ~ 6까지의 숫자만 입력해주세요"); break;
-						
+					manager.ShowMenu();
+					int choice = Utility.ConvertInt(Console.ReadLine());
+
+					switch (choice)
+					{
+						case 1: manager.InputData(); break;
+						case 2: manager.ListData(); break;
+						case 3: manager.SearchData(); break;
+						case 4: manager.DeleteData(); break;
+						case 5: manager.SortData(); break;
+						case 6: Console.WriteLine("프로그램을 종료합니다."); return;
+						default: throw new Exception("\n1 ~ 6까지의 숫자만 입력해주세요"); //break;
+					}
+				}
+				catch (Exception err)
+				{
+					Console.WriteLine(err.Message);
 				}
 			}
 		}

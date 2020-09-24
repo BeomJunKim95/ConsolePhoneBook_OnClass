@@ -43,14 +43,14 @@ namespace ConsolePhoneBook_OnClass
 			this.name = name;
 			this.phoneNumber = phoneNumber;
 		}
-
+		
 		public PhoneInfo(string name, string phoneNumber, string birth)
 		{
 			this.name = name;
 			this.phoneNumber = phoneNumber;
 			this.birth = birth;
 		}
-
+		
 		public virtual void ShowPhoneInfo()
 		{
 			Console.WriteLine("이름 : {0}\n번호 : {1}", Name, phoneNumber);

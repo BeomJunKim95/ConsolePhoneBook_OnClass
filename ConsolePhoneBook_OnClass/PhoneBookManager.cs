@@ -16,16 +16,22 @@ namespace ConsolePhoneBook_OnClass
 		int curCnt = 0;
 
 		//PhoneInfo phoneInfo = new PhoneInfo();
+		static PhoneBookManager instance;
+		private PhoneBookManager(){}
 
-		public PhoneBookManager()
+		public static PhoneBookManager CreateInstance() // 생성자를 만들어 주는거기 떄문에 반환타입은 생성자의 타입인 클래스명
 		{
+			//SingleTone1 instance; // 이게 전역으로 가야 메서드가 끝날때 사라지지 않는다
+			if (instance == null)
+				instance = new PhoneBookManager(); // 클래스 내부이기 때문에 private이여도 new할수있음
 
+			return instance; // 이미 인스턴스가 생성 되어 있으면 if문을 건너 뛰고 이미 생성된 인스턴스를 반환
 		}
 		public void ShowMenu()
 		{
-			Console.WriteLine("---------------------- 주소록 ------------------------");
+			Console.WriteLine("---------------------------- 주소록 ----------------------------");
 			Console.WriteLine("1. 입력  |  2. 목록  | 3. 검색  | 4.삭제  |  5. 정렬  |  6. 종료");
-			Console.WriteLine("------------------------------------------------------");
+			Console.WriteLine("----------------------------------------------------------------");
 			Console.Write("선택 : ");
 		}
 
@@ -33,13 +39,15 @@ namespace ConsolePhoneBook_OnClass
 		{
 			int choice;
 
+
 			Console.WriteLine("1. 일반  2. 대학  3. 회사");
 			Console.Write("선택 >>  ");
 			choice = Utility.ConvertInt(Console.ReadLine());
 			if (choice < 1 || choice > 3)
 			{
-				Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
-				return;
+				throw new Exception("1~3까지의 숫자만 입력해주세요");
+				//Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
+
 			}
 			PhoneInfo info = null;
 			switch (choice)
@@ -61,43 +69,88 @@ namespace ConsolePhoneBook_OnClass
 			}
 
 			#region 내코드
-				//for (curCnt = 0; curCnt < infoStorage.Length; curCnt++)
-				//{
-				//	Console.Write("이름을 입력하세요 [필수] : ");
-				//	string name = Console.ReadLine();
-				//	Console.Write("전화번호를 입력하세요 [필수] : ");
-				//	string phoneNumber = Console.ReadLine();
-				//	Console.WriteLine("생일을 입력하세요(YYMMDD) [선택] : ");
-				//	string birth = Console.ReadLine();
+			//for (curCnt = 0; curCnt < infoStorage.Length; curCnt++)
+			//{
+			//	Console.Write("이름을 입력하세요 [필수] : ");
+			//	string name = Console.ReadLine();
+			//	Console.Write("전화번호를 입력하세요 [필수] : ");
+			//	string phoneNumber = Console.ReadLine();
+			//	Console.WriteLine("생일을 입력하세요(YYMMDD) [선택] : ");
+			//	string birth = Console.ReadLine();
 
-				//	if (name == "" || phoneNumber == "")
-				//	{
-				//		Console.WriteLine("이름과 번호를 필수로 입력해주세요\n");
-				//		continue;
-				//	}
-				//	else if (birth == "")
-				//		infoStorage[curCnt] = new PhoneInfo(name, phoneNumber);
-				//	else
-				//		infoStorage[curCnt] = new PhoneInfo(name, phoneNumber, birth);
-				//}
-				#endregion
+			//	if (name == "" || phoneNumber == "")
+			//	{
+			//		Console.WriteLine("이름과 번호를 필수로 입력해주세요\n");
+			//		continue;
+			//	}
+			//	else if (birth == "")
+			//		infoStorage[curCnt] = new PhoneInfo(name, phoneNumber);
+			//	else
+			//		infoStorage[curCnt] = new PhoneInfo(name, phoneNumber, birth);
+			//}
+			#endregion
+		}
+		private string[] InputCommonInfo()
+		{
+			try
+			{
+				Console.Write("이름 : ");
+				string name = Console.ReadLine().Trim().Replace(" ", ""); //Trim() : 공백제거, Replace() : 공백이나 문자 제거
+				if (string.IsNullOrEmpty(name)) // if (name == "") or if (name.Length < 1) or if (name.Equals(""))
+				{
+					throw new Exception("이름은 필수입력입니다");
+					//Console.WriteLine("이름은 필수입력입니다");
+					//return null;
+				}
+				else
+				{
+					int dataIdx = SearhName(name);
+					if (dataIdx > -1)
+					{
+						throw new Exception("이미 등록된 이름입니다. 다른 이름으로 입력하세요");
+						//Console.WriteLine("이미 등록된 이름입니다. 다른 이름으로 입력하세요.");
+						//return null;
+					}
+				}
+
+				Console.Write("전화번호 : ");
+				string phoneNum = Console.ReadLine().Trim().Replace(" ", "");
+				if (string.IsNullOrEmpty(phoneNum))
+				{
+					Console.WriteLine("전화번호는 필수입력입니다");
+					return null;
+				}
+
+				Console.Write("생일 : ");
+				string birth = Console.ReadLine().Trim();
+
+				string[] arr = new string[3];
+				arr[0] = name;
+				arr[1] = phoneNum;
+				arr[2] = birth;
+
+				return arr;
+			}
+			catch(Exception err)
+			{
+				throw err;
+			}
 		}
 
-		private PhoneInfo InputCompanyInfo()
+		private PhoneInfo InputFriendInfo()
 		{
 			string[] cominfo = InputCommonInfo();
-			if (cominfo == null || cominfo.Length != 3)
+			if(cominfo == null || cominfo.Length != 3)
 				return null;
-			Console.Write("회사 : ");
-			string company = Console.ReadLine().Trim().Replace(" ", "");
-			if (string.IsNullOrEmpty(company))
+			if (cominfo[2].Length < 1)
 			{
-				Console.WriteLine("회사입력은 필수입력입니다");
-				return null;
+				return new PhoneInfo(cominfo[0], cominfo[1]);
 			}
-			return new PhoneCompanyInfo(cominfo[0], cominfo[1], cominfo[2], company);
+			else
+				return new PhoneInfo(cominfo[0], cominfo[1], cominfo[2]);
+			
 		}
-
+		
 		private PhoneInfo InputUnivInfo()
 		{
 			string[] cominfo = InputCommonInfo();
@@ -125,57 +178,21 @@ namespace ConsolePhoneBook_OnClass
 			//	return new PhoneInfo(cominfo[0], cominfo[1], cominfo[2]);
 		}
 
-		private string[] InputCommonInfo()
-		{
-			Console.Write("이름 : ");
-			string name = Console.ReadLine().Trim().Replace(" ", ""); //Trim() : 공백제거, Replace() : 공백이나 문자 제거
-			if (string.IsNullOrEmpty(name)) // if (name == "") or if (name.Length < 1) or if (name.Equals(""))
-			{
-				Console.WriteLine("이름은 필수입력입니다");
-				return null;
-			}
-			else
-			{
-				int dataIdx = SearhName(name);
-				if (dataIdx > -1)
-				{
-					Console.WriteLine("이미 등록된 이름입니다. 다른 이름으로 입력하세요.");
-					return null;
-				}
-			}
-
-			Console.Write("전화번호 : ");
-			string phoneNum = Console.ReadLine().Trim().Replace(" ", "");
-			if (string.IsNullOrEmpty(phoneNum))
-			{
-				Console.WriteLine("전화번호는 필수입력입니다");
-				return null;
-			}
-
-			Console.Write("생일 : ");
-			string birth = Console.ReadLine().Trim();
-
-			string[] arr = new string[3];
-			arr[0] = name;
-			arr[1] = phoneNum;
-			arr[2] = birth;
-
-			return arr;
-		}
-
-		private PhoneInfo InputFriendInfo()
+		private PhoneInfo InputCompanyInfo()
 		{
 			string[] cominfo = InputCommonInfo();
-			if(cominfo == null || cominfo.Length != 3)
+			if (cominfo == null || cominfo.Length != 3)
 				return null;
-			if (cominfo[2].Length < 1)
+			Console.Write("회사 : ");
+			string company = Console.ReadLine().Trim().Replace(" ", "");
+			if (string.IsNullOrEmpty(company))
 			{
-				return new PhoneInfo(cominfo[0], cominfo[1]);
+				Console.WriteLine("회사입력은 필수입력입니다");
+				return null;
 			}
-			else
-				return new PhoneInfo(cominfo[0], cominfo[1], cominfo[2]);
-			
+			return new PhoneCompanyInfo(cominfo[0], cominfo[1], cominfo[2], company);
 		}
+
 		public void ListData()
 		{
 			if (curCnt == 0)
