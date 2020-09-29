@@ -26,6 +26,7 @@ namespace ConsolePhoneBook_OnClass
 				return 0;
 		}
 	}
+	[Serializable]
 	public class PhoneInfo : IComparable
 	{
 		string name; //필수

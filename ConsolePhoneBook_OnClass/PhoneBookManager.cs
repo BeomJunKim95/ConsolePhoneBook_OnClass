@@ -2,7 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +28,35 @@ namespace ConsolePhoneBook_OnClass
 				instance = new PhoneBookManager(); // 클래스 내부이기 때문에 private이여도 new할수있음
 
 			return instance; // 이미 인스턴스가 생성 되어 있으면 if문을 건너 뛰고 이미 생성된 인스턴스를 반환
+		}
+
+		public void SaveDate()
+		{
+			BinaryFormatter serializer = new BinaryFormatter();
+
+			FileStream fs = new FileStream("phonebook.dat", FileMode.Create);
+			serializer.Serialize(fs, infoStorage);
+			fs.Close();
+			//Console.WriteLine("객체 직렬화 성공");
+		}
+
+		public void ReadData()
+		{
+			BinaryFormatter serializer = new BinaryFormatter();
+
+			if (File.Exists("phonebook.dat"))
+			{
+				FileStream rs = new FileStream("phonebook.dat", FileMode.Open);
+				PhoneInfo[] arr = (PhoneInfo[])serializer.Deserialize(rs);
+				curCnt = arr.Length;
+
+				Console.WriteLine("전화번호부를 성공적으로 불러왔습니다.");
+				//foreach (Person1 item in arr)
+				//{
+				//	Console.WriteLine(item.Name);
+				//}
+				rs.Close();
+			}
 		}
 		public void ShowMenu()
 		{
