@@ -16,9 +16,8 @@ namespace ConsolePhoneBook_OnClass
 			
 			PhoneBookManager manager = PhoneBookManager.CreateInstance();
 
-			//
+			manager.ReadData();
 			
-
 			while (true)
 			{
 				try

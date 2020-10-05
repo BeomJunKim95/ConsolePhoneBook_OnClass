@@ -14,8 +14,9 @@ namespace ConsolePhoneBook_OnClass
 	class PhoneBookManager
 	{
 		const int MAX_CNT = 100;
-		PhoneInfo[] infoStorage = new PhoneInfo[MAX_CNT];
 		int curCnt = 0;
+		PhoneInfo[] infoStorage = new PhoneInfo[MAX_CNT];
+		
 
 		//PhoneInfo phoneInfo = new PhoneInfo();
 		static PhoneBookManager instance;
@@ -35,9 +36,11 @@ namespace ConsolePhoneBook_OnClass
 			BinaryFormatter serializer = new BinaryFormatter();
 
 			FileStream fs = new FileStream("phonebook.dat", FileMode.Create);
-			serializer.Serialize(fs, infoStorage);
+			PhoneInfo[] saveFile = new PhoneInfo[curCnt];
+			Array.Copy(infoStorage, saveFile, curCnt);
+			serializer.Serialize(fs, saveFile);
 			fs.Close();
-			//Console.WriteLine("객체 직렬화 성공");
+			Console.WriteLine("전화번호부 저장완료");
 		}
 
 		public void ReadData()
@@ -47,8 +50,10 @@ namespace ConsolePhoneBook_OnClass
 			if (File.Exists("phonebook.dat"))
 			{
 				FileStream rs = new FileStream("phonebook.dat", FileMode.Open);
-				PhoneInfo[] arr = (PhoneInfo[])serializer.Deserialize(rs);
-				curCnt = arr.Length;
+				PhoneInfo[] loadFile = (PhoneInfo[])serializer.Deserialize(rs);
+				curCnt = loadFile.Length;
+				Array.Copy(loadFile, infoStorage, curCnt);
+				//infoStorage = loadFile;
 
 				Console.WriteLine("전화번호부를 성공적으로 불러왔습니다.");
 				//foreach (Person1 item in arr)
