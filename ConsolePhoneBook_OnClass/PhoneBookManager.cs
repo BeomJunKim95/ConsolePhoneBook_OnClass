@@ -13,15 +13,16 @@ namespace ConsolePhoneBook_OnClass
 	
 	class PhoneBookManager
 	{
-		const int MAX_CNT = 100;
-		int curCnt = 0;
+		//const int MAX_CNT = 100;
+		//int curCnt = 0;
 		//PhoneInfo[] infoStorage = new PhoneInfo[MAX_CNT];
 		HashSet<PhoneInfo> infoStorage = new HashSet<PhoneInfo>();
 
 
+
 		//PhoneInfo phoneInfo = new PhoneInfo();
-		static PhoneBookManager instance;
-		private PhoneBookManager(){}
+		static PhoneBookManager instance = null;
+		private PhoneBookManager(){} //싱글톤을 위한 기본생성자 private
 
 		public static PhoneBookManager CreateInstance() // 생성자를 만들어 주는거기 떄문에 반환타입은 생성자의 타입인 클래스명
 		{
@@ -56,7 +57,6 @@ namespace ConsolePhoneBook_OnClass
 				int a_length = loadFile.Length;
 				PhoneInfo[] a_infoStorage = infoStorage.ToArray<PhoneInfo>();
 				Array.Copy(loadFile, a_infoStorage, a_length);
-				//infoStorage = loadFile;
 
 				Console.WriteLine("전화번호부를 성공적으로 불러왔습니다.");
 				//foreach (Person1 item in arr)
@@ -78,33 +78,51 @@ namespace ConsolePhoneBook_OnClass
 		{
 			int choice;
 
-
-			Console.WriteLine("1. 일반  2. 대학  3. 회사");
-			Console.Write("선택 >>  ");
-			choice = Utility.ConvertInt(Console.ReadLine());
-			if (choice < 1 || choice > 3)
+			while (true)
 			{
-				throw new Exception("1~3까지의 숫자만 입력해주세요");
-				//Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
-
-			}
-			PhoneInfo info = null;
-			switch (choice)
-			{
-				case 1:
-					info = InputFriendInfo();
-					break;
-				case 2:
-					info = InputUnivInfo();
-					break;
-				case 3:
-					info = InputCompanyInfo();
-					break;
-			}
-			if (info != null)
-			{
-				infoStorage.Add(info);
-				Console.WriteLine("성공적으로 등록이 완료됐습니다.\n");
+				try
+				{
+					Console.WriteLine("1. 일반  2. 대학  3. 회사");
+					Console.Write("선택 >>  ");
+					choice = Utility.ConvertInt(Console.ReadLine());
+					if (choice < 1 || choice > 3)
+					{
+						throw new MenuChoiceException(choice);
+						//Console.WriteLine("1~3까지의 숫자만 입력해주세요.");
+					}
+					else
+					{
+						PhoneInfo info = null;
+						switch (choice)
+						{
+							case 1:
+								info = InputFriendInfo();
+								break;
+							case 2:
+								info = InputUnivInfo();
+								break;
+							case 3:
+								info = InputCompanyInfo();
+								break;
+						}
+						if (info != null)
+						{
+							bool isAdded = infoStorage.Add(info);
+							if(isAdded)
+								Console.WriteLine("성공적으로 등록이 완료됐습니다.\n");
+							else
+								Console.WriteLine("이미 저장된 데이터 입니다.");
+						}
+					}
+				}
+				catch (MenuChoiceException err)
+				{
+					err.ShowWrongChoice();
+				}
+				catch (Exception err)
+				{
+					Console.WriteLine(err.Message);
+				}
 			}
 
 			#region 내코드
@@ -137,14 +155,14 @@ namespace ConsolePhoneBook_OnClass
 				string name = Console.ReadLine().Trim().Replace(" ", ""); //Trim() : 공백제거, Replace() : 공백이나 문자 제거
 				if (string.IsNullOrEmpty(name)) // if (name == "") or if (name.Length < 1) or if (name.Equals(""))
 				{
-					throw new Exception("이름은 필수입력입니다");
+					throw new InputException("이름");
 					//Console.WriteLine("이름은 필수입력입니다");
 					//return null;
 				}
 				else
 				{
-					int dataIdx = SearhName(name);
-					if (dataIdx > -1)
+					//int dataIdx = SearhName(name);
+					if (SearhName(name))
 					{
 						throw new Exception("이미 등록된 이름입니다. 다른 이름으로 입력하세요");
 						//Console.WriteLine("이미 등록된 이름입니다. 다른 이름으로 입력하세요.");
@@ -170,9 +188,15 @@ namespace ConsolePhoneBook_OnClass
 
 				return arr;
 			}
+			catch(InputException err)
+			{
+				err.ShowWrongInput();
+				return null;
+			}
 			catch(Exception err)
 			{
-				throw err;
+				Console.WriteLine(err.Message);
+				return null;
 			}
 		}
 
@@ -252,22 +276,32 @@ namespace ConsolePhoneBook_OnClass
 		public void SearchData()
 		{
 			Console.WriteLine("주소록 검색을 시작합니다......");
-			int dataIdx = SearhName();
-			if (dataIdx < 0)
+			PhoneInfo findInfo = SearhName();
+			if (findInfo == null)
 			{
 				Console.WriteLine("검색된 데이터가 없습니다");
+				return;
 			}
 			else
 			{
-				PhoneInfo[] a_infoStorage = infoStorage.ToArray<PhoneInfo>();
-				a_infoStorage[dataIdx].ShowPhoneInfo();
+				findInfo.ShowPhoneInfo();
+				Console.WriteLine();
 			}
 		}
 
-		private int SearhName()
+		private PhoneInfo SearhName()
 		{
 			Console.Write("이름 : ");
 			string name = Console.ReadLine().Trim().Replace(" ", "");
+
+			foreach(PhoneInfo info in infoStorage)
+			{
+				if(name.CompareTo(info.Name) == 0)
+				{
+					return info;
+				}
+			}
+			return null;
 
 			#region 모두 찾기
 			//int findCnt = 0;
@@ -296,20 +330,26 @@ namespace ConsolePhoneBook_OnClass
 			//	Console.WriteLine($"총{findCnt}명이 검색되었습니다.\n");
 			#endregion
 
-			for (int i = 0; i < curCnt; i++)
-			{
-				PhoneInfo[] a_infoStorage = infoStorage.ToArray<PhoneInfo>();
-				if (a_infoStorage[i].Name.ToLower().CompareTo(name) == 0)
-				{
-					return i; // 검색결과를 찾으면 인덱스로 반환 받기 
-				}
-			}
+			//for (int i = 0; i < curCnt; i++)
+			//{
+			//	PhoneInfo[] a_infoStorage = infoStorage.ToArray<PhoneInfo>();
+			//	if (a_infoStorage[i].Name.ToLower().CompareTo(name) == 0)
+			//	{
+			//		return i; // 검색결과를 찾으면 인덱스로 반환 받기 
+			//	}
+			//}
 
-			return -1; // 
+			//return -1; // 
 		}
 
-		private int SearhName(string name) //이름을 입력하는 코드를 지우기 위한 중복정의
+		private bool SearhName(string name) //이름을 입력하는 코드를 지우기 위한 중복정의
 		{
+			foreach(PhoneInfo info in infoStorage)
+			{
+				if (info.Name.Equals(name))
+					return true;
+			}
+			return false;
 			
 			#region 모두 찾기
 			//int findCnt = 0;
@@ -338,16 +378,17 @@ namespace ConsolePhoneBook_OnClass
 			//	Console.WriteLine($"총{findCnt}명이 검색되었습니다.\n");
 			#endregion
 
-			for (int i = 0; i < infoStorage.Count; i++)
-			{
-				PhoneInfo[] a_infoStorage = infoStorage.ToArray<PhoneInfo>();
-				if (a_infoStorage[i].Name.ToLower().CompareTo(name) == 0)
-				{
-					return i; // 검색결과를 찾으면 인덱스로 반환 받기 
-				}
-			}
 
-			return -1; // 검색결과를 찾지못하면 -1반환 
+			//for (int i = 0; i < infoStorage.Count; i++)
+			//{
+			//	PhoneInfo[] a_infoStorage = infoStorage.ToArray<PhoneInfo>();
+			//	if (a_infoStorage[i].Name.ToLower().CompareTo(name) == 0)
+			//	{
+			//		return i; // 검색결과를 찾으면 인덱스로 반환 받기 
+			//	}
+			//}
+
+			//return -1; // 검색결과를 찾지못하면 -1반환 
 		}
 
 		public void DeleteData()

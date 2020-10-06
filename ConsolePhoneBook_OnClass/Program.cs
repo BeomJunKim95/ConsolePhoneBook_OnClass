@@ -13,7 +13,6 @@ namespace ConsolePhoneBook_OnClass
 	{
 		static void Main(string[] args)
 		{
-			
 			PhoneBookManager manager = PhoneBookManager.CreateInstance();
 
 			manager.ReadData();
@@ -22,22 +21,36 @@ namespace ConsolePhoneBook_OnClass
 			{
 				try
 				{
-					manager.ShowMenu();
-					int choice = Utility.ConvertInt(Console.ReadLine());
-
-					switch (choice)
+					while (true)
 					{
-						case 1: manager.InputData(); break;
-						case 2: manager.ListData(); break;
-						case 3: manager.SearchData(); break;
-						case 4: manager.DeleteData(); break;
-						case 5: manager.SortData(); break;
-						case 6: manager.SaveDate();
-								Console.WriteLine("프로그램을 종료합니다."); return;
-						default: throw new Exception("\n1 ~ 6까지의 숫자만 입력해주세요"); //break;
+						manager.ShowMenu();
+						int choice = Utility.ConvertInt(Console.ReadLine());
+						if (choice < 1 || choice > 6)
+						{
+							throw new MenuChoiceException(choice);
+						}
+						else
+						{
+							switch (choice)
+							{
+								case 1: manager.InputData(); break;
+								case 2: manager.ListData(); break;
+								case 3: manager.SearchData(); break;
+								case 4: manager.DeleteData(); break;
+								case 5: manager.SortData(); break;
+								case 6:
+									manager.SaveDate();
+									Console.WriteLine("프로그램을 종료합니다."); return;
+									//default: throw new Exception("\n1 ~ 6까지의 숫자만 입력해주세요"); //break;
+							}
+						}
 					}
 				}
-				catch (Exception err)
+				catch (MenuChoiceException err)
+				{
+					err.ShowWrongChoice();
+				}
+				catch(Exception err)
 				{
 					Console.WriteLine(err.Message);
 				}

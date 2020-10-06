@@ -88,6 +88,7 @@ namespace ConsolePhoneBook_OnClass
 			
 		}
 	}
+	[Serializable]
 	public class PhoneUnivInfo : PhoneInfo
 	{
 		string major;
@@ -111,7 +112,7 @@ namespace ConsolePhoneBook_OnClass
 
 		}
 	}
-
+	[Serializable]
 	public class PhoneCompanyInfo : PhoneInfo
 	{
 		string company;

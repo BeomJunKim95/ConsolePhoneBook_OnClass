@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MenuChoiceException.cs" />
     <Compile Include="PhoneBookManager.cs" />
     <Compile Include="PhoneInfo.cs" />
     <Compile Include="Program.cs" />
